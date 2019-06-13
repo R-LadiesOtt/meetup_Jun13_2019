@@ -1,0 +1,38 @@
+---
+title: "R-ladies Ottawa"
+subtitle: "Intro"
+author: "Stephanie Houle"
+date: \today
+output:
+  xaringan::moon_reader:
+    css: ["default", "rladies", "rladies-fonts"]
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+# Agenda
+
+  1. News
+  2. Data Manipulation with dplyr - by Deirdre Hennessy
+  3. Managing Memory in R - by Carol Perez Iracheta
+  4. Research highlight:
+  
+      **Projecting the cumulative effect of harvest, fire and roads on forest and boreal caribou: a northwestern Ontario example - by Josie Hughes**
+
+---
+
+# News
+
+ 1. GitHub Page: [https://github.com/R-LadiesOtt](https://github.com/R-LadiesOtt)
+    - Presentation slides
+    - Resources for R
+    - Feedback/presentation schedule
+    
+ 2. Future events:
+    - Jenny Bryan, invited by OHRI
+    - You!
+
+
+
