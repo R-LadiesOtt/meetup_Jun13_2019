@@ -1,0 +1,176 @@
+---
+title: "R ladies Ottawa Meeting June 2019"
+author: "Deirdre Hennessy"
+date: "June 12th, 2019"
+output:
+  prettydoc::html_pretty:
+    highlight: github
+    theme: cayman
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(dplyr)
+library(DataExplorer)
+library(ggplot2)
+library(readr)
+
+```
+
+## Data manipulation with dplyr and the iris dataset
+
+The tidyverse, which includes dplyr, is a collection of packages used for reading data, data manipulation, graphing and other things. 
+
+https://www.tidyverse.org/packages/
+
+https://r4ds.had.co.nz/tidy-data.html
+
+
+"Stunning is one of the most useful spells in your arsenal. It's sort of a wizard's bread and butter, really." -Harry Potter regarding the usefulness of the spell.
+
+"The tidyverse is one of the most useful collections of packages in your arsenal. It's sort of a analyst's bread and butter, really." -Deirdre Hennessy  regarding the usefulness of the tidyverse. 
+
+
+
+
+## Look at my data
+
+First I am going to take a look at my data.
+
+
+```{r}
+
+head(iris)
+str(iris)
+summary(iris)
+
+# If I wanted to get a little fancier I could use the DataExplorer package to create a report
+
+create_report(iris)
+```
+
+# 1. Use select to reorder and rename to ..........rename (select)
+
+
+Next I am going to arrange the data set the way I want to see it.
+
+```{r}
+
+iris_df<-iris %>% 
+  select(Species:Sepal.Length)  %>%  # to reorder
+  
+  rename( petal_width = Petal.Width)  %>% # to rename
+  rename( petal_length = Petal.Length) %>% 
+  rename( sepal_width = Sepal.Width)  %>% 
+  rename( sepal_length = Sepal.Length)  
+
+head(iris_df)
+
+```
+
+# 2. Select the columns I require (select)
+
+```{r}
+
+iris_df_sepal<- iris_df  %>% 
+  select(species=Species, sepal_width, sepal_length)
+
+head(iris_df_sepal)
+
+# I want to look at the distribution of sepal length
+
+summary(iris_df_sepal$sepal_length)
+
+ggplot(iris_df_sepal, aes(sepal_length)) +
+  geom_histogram(bins = 25)
+
+
+```
+
+# 3. It might be interesting to look at sepal length of greater than 5- filter the rows I require (filter)
+
+```{r}
+
+iris_df_sepal<- iris_df  %>% 
+  select(species=Species, sepal_width, sepal_length)   %>% 
+  filter(sepal_length>=5.0) %>% 
+  filter(species== "virginica") 
+
+# or it is possible to add mulitple filter conditions to the same line 
+
+iris_df_sepal<- iris_df  %>% 
+  select(species=Species, sepal_width, sepal_length)   %>% 
+  filter(sepal_length>=5.0, species== "virginica")
+
+head(iris_df_sepal)
+
+
+```
+
+# 4. Now I want to transform my variables for analysis- create a new ratio varaible (mutate)
+
+```{r}
+
+iris_df_sepal<- iris_df  %>% 
+  select(species=Species, sepal_width, sepal_length)   %>% 
+  filter(sepal_length>=5.0, species== "virginica")  %>%
+  
+  mutate(wlratio=sepal_width/sepal_length) #
+
+head(iris_df_sepal)
+```
+
+# 5. Next I want to summarise my variables by species (group_by and summarise )
+
+```{r}
+
+iris_df_all<- iris_df  %>% 
+  select(species=Species, sepal_width, sepal_length, petal_width, petal_length)   %>% 
+  mutate(wlratio_sepal=sepal_width/sepal_length)  %>%
+  mutate(wlratio_petal=petal_width/petal_length)  %>%
+   
+  group_by(species) %>%
+  summarise(mean_sepalw=mean(sepal_width), mean_sepall=mean(sepal_length),
+            mean_petalw=mean(petal_width), mean_petall=mean(petal_length),
+            meanwl_sep=mean(wlratio_sepal), meanwl_pet=mean(wlratio_petal))
+
+head(iris_df_all)
+
+```
+
+# 6. Playing with spread and gather.....we need more complex data
+
+```{r}
+
+# Data on projected diabetes cases
+
+diabetes <- read.csv("C:/Users/colli/Desktop/PHAC_Infobase_CCDSS.csv")
+
+# Select and filter what I need
+
+head(diabetes)
+
+diabetes_red <- diabetes %>%
+  select(Sex, Year, province=Area, prevalence=Rate, Age= Age.Group)  %>%
+  filter(province == 'Canada', Sex == 'Both sexes', Year > 2000, Age == "'20-34'") %>%
+  
+  spread(key=Year, value=prevalence) 
+
+head(diabetes_red)
+
+diabetes_red <- diabetes %>%
+  select(Sex, Year, province=Area, prevalence=Rate, Age= Age.Group)  %>%
+  filter(province == 'Canada', Sex == 'Both sexes', Year > 2000, Age == "'20-34'") %>%
+  
+  spread(key=Year, value=prevalence) %>%
+  
+  gather('2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010','2011', '2012', '2013', '2014', '2015', key = "Year", value = "proportion")
+
+head(diabetes_red)
+```
+
+
